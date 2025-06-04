@@ -1,4 +1,6 @@
 # Project PHP
+**233210013 - Muhammad Maulana Firdaussyah**
+## Responsi Pemograman Web Server Side 
 
 Aplikasi manajemen keuangan berbasis web yang dibuat dengan PHP, dirancang untuk membantu pengguna dalam melacak, menganalisis, dan membuat laporan keuangan pribadi. Project ini menyediakan dashboard, manajemen transaksi, serta pelaporan fleksibel dengan fitur ekspor data.
 
@@ -10,6 +12,13 @@ Aplikasi manajemen keuangan berbasis web yang dibuat dengan PHP, dirancang untuk
 - **Laporan Keuangan**: Buat laporan keuangan berdasarkan tanggal, kategori, dan jenis transaksi. Laporan dapat diekspor ke format CSV, XLS, atau PDF.
 - **Grafik Interaktif**: Visualisasi tren bulanan dan rincian kategori menggunakan Chart.js.
 - **Desain Responsif**: Antarmuka modern dan bersih yang responsif untuk berbagai perangkat.
+
+## Cara Penggunaan
+
+- **Tambah Transaksi:** Catat pemasukan/pengeluaran, atur kategori.
+- **Lihat Dashboard:** Pantau ringkasan bulanan, grafik, dan transaksi terbaru.
+- **Buat Laporan:** Filter berdasarkan tanggal, jenis, dan kategori; ekspor untuk kebutuhan offline.
+- **Ekspor Data:** Unduh laporan ke format CSV, XLS, atau PDF.
 
 ## Screenshot
 
@@ -23,6 +32,14 @@ Aplikasi manajemen keuangan berbasis web yang dibuat dengan PHP, dirancang untuk
 - **HTML/CSS/JS**: Struktur dan interaktifitas front-end
 - **Chart.js**: Visualisasi data pada dashboard dan laporan
 - **Tailwind CSS** (opsional): Untuk desain responsif berbasis utility (bila digunakan pada UI)
+
+## Struktur Folder
+
+- `/index.php` - Dashboard utama dengan ringkasan keuangan dan grafik
+- `/reports/` - Fitur pelaporan keuangan dan ekspor data
+- `/includes/` - File konfigurasi, header, dan footer
+- `/auth/` - Komponen autentikasi (login, registrasi)
+- `/transactions/` - Manajemen transaksi (tambah, edit, lihat)
 
 ## Cara Instalasi
 
@@ -43,28 +60,6 @@ Aplikasi manajemen keuangan berbasis web yang dibuat dengan PHP, dirancang untuk
    - Deploy di server lokal/web yang mendukung PHP dan MySQL.
    - Akses aplikasi via browser.
 
-## Struktur Folder
-
-- `/index.php` - Dashboard utama dengan ringkasan keuangan dan grafik
-- `/reports/` - Fitur pelaporan keuangan dan ekspor data
-- `/includes/` - File konfigurasi, header, dan footer
-- `/auth/` - Komponen autentikasi (login, registrasi)
-- `/transactions/` - Manajemen transaksi (tambah, edit, lihat)
-
-## Cara Penggunaan
-
-- **Tambah Transaksi:** Catat pemasukan/pengeluaran, atur kategori.
-- **Lihat Dashboard:** Pantau ringkasan bulanan, grafik, dan transaksi terbaru.
-- **Buat Laporan:** Filter berdasarkan tanggal, jenis, dan kategori; ekspor untuk kebutuhan offline.
-- **Ekspor Data:** Unduh laporan ke format CSV, XLS, atau PDF.
-
-## Kontribusi
-
-1. Fork repository ini
-2. Buat branch fitur baru (`git checkout -b fitur/NamaFiturAnda`)
-3. Commit perubahan (`git commit -am 'Tambah fitur baru'`)
-4. Push ke branch (`git push origin fitur/NamaFiturAnda`)
-5. Buat Pull Request baru
 
 ## Lisensi
 
