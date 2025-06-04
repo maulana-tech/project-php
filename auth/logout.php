@@ -1,8 +1,5 @@
 <?php
-// Include configuration file
 require_once '../includes/config.php';
-
-// Unset all session variables
 $_SESSION = array();
 
 // Destroy the session

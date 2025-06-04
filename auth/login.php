@@ -1,36 +1,28 @@
 <?php
-// Include configuration file
 require_once '../includes/config.php';
 
-// Check if user is already logged in, if yes redirect to dashboard
 if (is_logged_in()) {
     redirect(SITE_URL . '/index.php');
 }
-
-// Set page title
 $page_title = 'Login';
 
-// Process login form submission
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get form data
     $username = sanitize_input($_POST['username']);
-    $password = $_POST['password']; // Don't sanitize password before verification
+    $password = $_POST['password'];
     
-    // Validate input
     if (empty($username) || empty($password)) {
         $error = 'Please enter both username and password';
     } else {
-        // Check if user exists
         $query = "SELECT id, username, password, role FROM users WHERE username = '{$username}' OR email = '{$username}'";
         $result = $conn->query($query);
         
         if ($result->num_rows === 1) {
             $user = $result->fetch_assoc();
-            
-            // Verify password
+
             if (password_verify($password, $user['password'])) {
-                // Password is correct, create session
+                // Set session variables
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['user_role'] = $user['role'];

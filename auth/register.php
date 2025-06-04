@@ -1,7 +1,5 @@
 <?php
-// Include configuration file
 require_once '../includes/config.php';
-
 // Check if user is already logged in, if yes redirect to dashboard
 if (is_logged_in()) {
     redirect(SITE_URL . '/index.php');
@@ -10,14 +8,13 @@ if (is_logged_in()) {
 // Set page title
 $page_title = 'Register';
 
-// Process registration form submission
 $error = '';
 $success = false;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get form data
     $username = sanitize_input($_POST['username']);
     $email = sanitize_input($_POST['email']);
-    $password = $_POST['password']; // Don't sanitize password before hashing
+    $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
     
     // Validate input
@@ -59,7 +56,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Include header
 include_once '../includes/header.php';
 ?>
 
