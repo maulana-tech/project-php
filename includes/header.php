@@ -1,3 +1,10 @@
+<?php
+// Pastikan SITE_URL sudah didefinisikan di config.php
+if (!defined('SITE_URL')) {
+    // Jika belum, definisikan di sini sebagai fallback
+    define('SITE_URL', '/project-php');
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,7 +80,7 @@
         
         <!-- Mobile menu button -->
         <div class="md:hidden fixed top-0 left-0 z-50 w-full bg-white border-b">
-            <div class="flex items-center justify-between px-4 py-3">
+            <div class="flex items-center justify-between px-4 py-3"> <!-- Sudah tidak ada max-width di sini -->
                 <div class="flex items-center">
                     <button id="mobile-menu-button" class="text-gray-500 hover:text-gray-600 focus:outline-none focus:text-gray-600">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -138,7 +145,7 @@
         </div>
         
         <!-- Main content -->
-        <div class="flex flex-col flex-1 overflow-y-auto pt-0 md:pt-0">
+        <div class="flex flex-col flex-1 overflow-y-auto">
             <?php if (isset($_SESSION['message'])): ?>
                 <div class="bg-<?php echo $_SESSION['message_type']; ?>-100 border-l-4 border-<?php echo $_SESSION['message_type']; ?>-500 text-<?php echo $_SESSION['message_type']; ?>-700 p-4 mb-4 mx-4 mt-4" role="alert">
                     <p><?php echo $_SESSION['message']; ?></p>
@@ -168,6 +175,8 @@
     </style>
 </head>
 <body>
+    <!-- For non-logged in users, we don't include navigation here -->
+    <!-- Landing page will include landing_navigation.php separately -->
     <div class="min-h-screen bg-gray-100 flex flex-col justify-center">
         <div class="container mx-auto px-4 py-8">
             <?php if (isset($_SESSION['message'])): ?>
