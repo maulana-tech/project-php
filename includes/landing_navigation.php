@@ -114,7 +114,7 @@ if (!defined('SITE_URL')) {
                 <a href="#how-it-works" class="nav-link font-medium">Cara Kerja</a>
                 <a href="<?php echo SITE_URL; ?>/auth/login.php" class="nav-link font-medium">Masuk</a>
                 <a href="<?php echo SITE_URL; ?>/auth/register.php" class="ml-4 inline-flex items-center justify-center px-5 py-2.5 border border-transparent rounded-lg text-sm font-bold text-indigo-600 bg-white shadow-sm hover:bg-gray-100 transition-transform transform hover:scale-105">
-                    Daftar Gratis
+                    Daftar
                 </a>
             </div>
 
