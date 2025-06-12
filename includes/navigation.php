@@ -22,10 +22,6 @@ if (!defined('SITE_URL')) {
         </div>
         <div class="flex flex-col flex-grow p-4 overflow-y-auto">
             <nav class="flex-1 space-y-2">
-                <a href="<?php echo route('ROUTE_HOME'); ?>" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-indigo-600 rounded-md">
-                    <i class="fas fa-house mr-3"></i>
-                    <span>Home</span>
-                </a>
                 <a href="<?php echo route('ROUTE_DASHBOARD'); ?>" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-indigo-600 rounded-md <?php echo active_class('ROUTE_DASHBOARD'); ?>">
                     <i class="fas fa-home mr-3"></i>
                     <span>Dashboard</span>
@@ -50,17 +46,21 @@ if (!defined('SITE_URL')) {
                 <?php endif; ?>
             </nav>
             <div class="mt-auto">
-                <div class="pt-2 border-t border-gray-200">
-                    <a href="<?php echo route('ROUTE_PROFILE'); ?>" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-indigo-600 rounded-md <?php echo active_class('ROUTE_PROFILE'); ?>">
-                        <i class="fas fa-user-circle mr-3"></i>
-                        <span>Profile</span>
-                    </a>
-                    <a href="<?php echo route('ROUTE_LOGOUT'); ?>" class="flex items-center px-4 py-2 mt-1 text-gray-700 hover:bg-gray-100 hover:text-red-600 rounded-md">
-                        <i class="fas fa-sign-out-alt mr-3"></i>
-                        <span>Logout</span>
-                    </a>
-                </div>
+            <div class="pt-2 border-t border-gray-200">
+                <a href="<?php echo route('ROUTE_PROFILE'); ?>" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-indigo-600 rounded-md <?php echo active_class('ROUTE_PROFILE'); ?>">
+                    <i class="fas fa-user-circle mr-3"></i>
+                    <span>Profile</span>
+                </a>
+                <a href="<?php echo route('ROUTE_LOGOUT'); ?>?redirect=landing" class="flex items-center px-4 py-2 mt-1 text-gray-700 hover:bg-gray-100 hover:text-indigo-600 rounded-md">
+                    <i class="fas fa-globe mr-3"></i>
+                    <span>Kembali ke Landing</span>
+                </a>
+                <a href="<?php echo route('ROUTE_LOGOUT'); ?>" class="flex items-center px-4 py-2 mt-1 text-gray-700 hover:bg-gray-100 hover:text-red-600 rounded-md">
+                    <i class="fas fa-sign-out-alt mr-3"></i>
+                    <span>Logout</span>
+                </a>
             </div>
+        </div>
         </div>
     </div>
 </div>
@@ -74,10 +74,6 @@ if (!defined('SITE_URL')) {
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                 </svg>
             </button>
-            <a href="<?php echo route('ROUTE_HOME'); ?>" class="text-indigo-600 hover:text-indigo-700">
-                <i class="fas fa-house mr-1"></i>
-                <span>Home</span>
-            </a>
             <h1 class="text-lg font-semibold text-indigo-600">Financial Analysis</h1>
         </div>
         <div>
@@ -122,13 +118,17 @@ if (!defined('SITE_URL')) {
                     <a href="<?php echo SITE_URL; ?>/import/index.php" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-indigo-600 rounded-md <?php echo strpos($_SERVER['PHP_SELF'], '/import/') !== false ? 'active-nav-link' : ''; ?>">
                         <i class="fas fa-file-import mr-3"></i>
                         <span>Import Data</span>
-                    </a>
                     <?php if (is_admin()): ?>
                     <a href="<?php echo SITE_URL; ?>/admin/index.php" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-indigo-600 rounded-md <?php echo strpos($_SERVER['PHP_SELF'], '/admin/') !== false ? 'active-nav-link' : ''; ?>">
                         <i class="fas fa-user-shield mr-3"></i>
                         <span>Admin Panel</span>
                     </a>
                     <?php endif; ?>
+
+                    <a href="<?php echo route('ROUTE_LOGOUT'); ?>?redirect=landing" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-indigo-600 rounded-md">
+                        <i class="fas fa-globe mr-3"></i>
+                        <span>Kembali ke Landing</span>
+                    </a>
                     <a href="<?php echo SITE_URL; ?>/profile/index.php" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-indigo-600 rounded-md <?php echo strpos($_SERVER['PHP_SELF'], '/profile/') !== false ? 'active-nav-link' : ''; ?>">
                         <i class="fas fa-user-circle mr-3"></i>
                         <span>Profile</span>

@@ -32,7 +32,10 @@ if (!defined('SITE_URL')) {
             background-color: #f9fafb;
         }
         .active-nav-link {
-            @apply bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600;
+            background-color: #eef2ff; /* Tailwind bg-indigo-50 */
+            color: #4f46e5;            /* Tailwind text-indigo-600 */
+            border-left-width: 4px;    /* Tailwind border-l-4 */
+            border-left-color: #4f46e5;/* Tailwind border-indigo-600 */
         }
     </style>
 </head>

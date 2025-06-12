@@ -45,19 +45,19 @@ $page_title = 'Selamat Datang di Analisis Keuangan Pribadi Anda';
                     </p>
                     <div class="flex flex-col sm:flex-row justify-center md:justify-start space-y-4 sm:space-y-0 sm:space-x-4">
                         <a href="<?php echo SITE_URL; ?>/auth/register.php" class="bg-white text-indigo-600 hover:bg-opacity-90 font-semibold py-3 px-8 rounded-lg text-lg shadow-lg transform hover:scale-105 transition duration-300 ease-in-out">
-                            Mulai Sekarang <i class="fas fa-arrow-right ml-2"></i>
+                            Mulai <i class="fas fa-arrow-right ml-2"></i>
                         </a>
                         <a href="#features" class="bg-transparent border-2 border-white hover:bg-white hover:text-indigo-600 font-semibold py-3 px-8 rounded-lg text-lg shadow-lg transform hover:scale-105 transition duration-300 ease-in-out">
                             Pelajari Fitur
                         </a>
                     </div>
                 </div>
-                <div class="hidden md:block">
-                    <img src="https://placehold.co/600x450/ffffff/6366f1?text=Visualisasi+Keuangan+Anda&font=raleway" 
-                         alt="Ilustrasi Manajemen Keuangan" 
-                         class="rounded-xl shadow-2xl transform hover:scale-105 transition-transform duration-500 ease-out"
-                         onerror="this.src='https://placehold.co/600x450/ffffff/6366f1?text=Manajemen+Keuangan'">
-                         <!-- Path gambar asli: <?php echo SITE_URL; ?>/assets/images/finance-illustration.svg -->
+                <div class="hidden md:block transform transition-transform duration-500 hover:scale-105" id="image-container">
+                    <img id="interactive-image" 
+                        src="<?php echo SITE_URL; ?>/assets/images/dashboard.png" 
+                        alt="Ilustrasi Fitur Aplikasi" 
+                        class="rounded-xl shadow-2xl transition-opacity duration-500 ease-in-out"
+                        onerror="this.src='https://placehold.co/600x450/ffffff/6366f1?text=Manajemen+Keuangan'">
                 </div>
             </div>
         </div>
@@ -180,7 +180,7 @@ $page_title = 'Selamat Datang di Analisis Keuangan Pribadi Anda';
                 Bergabunglah dengan ribuan pengguna yang telah merasakan kemudahan mengelola finansial pribadi.
             </p>
             <a href="<?php echo SITE_URL; ?>/auth/register.php" class="bg-white text-indigo-700 hover:bg-opacity-90 font-bold py-4 px-10 rounded-lg text-lg shadow-xl transform hover:scale-105 transition duration-300 ease-in-out">
-                Daftar Gratis Sekarang
+                Coba Sekarang <i class="fas fa-arrow-right ml-2"></i>
             </a>
         </div>
     </section>
@@ -219,9 +219,9 @@ $page_title = 'Selamat Datang di Analisis Keuangan Pribadi Anda';
                 <div>
                     <h3 class="text-lg font-semibold text-white mb-4">Hubungi Kami</h3>
                     <ul class="space-y-2 text-sm">
-                        <li><i class="fas fa-envelope mr-2 text-indigo-400"></i> support@financialapp.com</li>
+                        <li><i class="fas fa-envelope mr-2 text-indigo-400"></i> firdaussyah03@gmail.com</li>
                         <li><i class="fas fa-phone mr-2 text-indigo-400"></i> +62 21 1234 5678</li>
-                        <li><i class="fas fa-map-marker-alt mr-2 text-indigo-400"></i> Jakarta, Indonesia</li>
+                        <li><i class="fas fa-map-marker-alt mr-2 text-indigo-400"></i> Yogyakarta, Indonesia</li>
                     </ul>
                 </div>
             </div>
@@ -232,52 +232,94 @@ $page_title = 'Selamat Datang di Analisis Keuangan Pribadi Anda';
     </footer>
 
     <script>
-    // Mobile menu toggle for landing page
-    document.addEventListener('DOMContentLoaded', function () {
-        const menuButton = document.getElementById('mobile-landing-menu-button');
-        const mobileMenu = document.getElementById('mobile-landing-menu');
+document.addEventListener('DOMContentLoaded', function () {
+    // Bagian 1: Logika untuk Mobile Menu & Smooth Scroll
 
-        if (menuButton && mobileMenu) {
-            menuButton.addEventListener('click', function () {
-                const expanded = this.getAttribute('aria-expanded') === 'true' || false;
-                this.setAttribute('aria-expanded', !expanded);
-                mobileMenu.classList.toggle('hidden');
-                // Toggle icon
-                const icon = this.querySelector('i');
-                if (icon.classList.contains('fa-bars')) {
-                    icon.classList.remove('fa-bars');
-                    icon.classList.add('fa-times');
-                } else {
-                    icon.classList.remove('fa-times');
-                    icon.classList.add('fa-bars');
+    const menuButton = document.getElementById('mobile-landing-menu-button');
+    const mobileMenu = document.getElementById('mobile-landing-menu');
+
+    if (menuButton && mobileMenu) {
+        menuButton.addEventListener('click', function () {
+            const expanded = this.getAttribute('aria-expanded') === 'true' || false;
+            this.setAttribute('aria-expanded', !expanded);
+            mobileMenu.classList.toggle('hidden');
+            
+            const icon = this.querySelector('i');
+            if (icon.classList.contains('fa-bars')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        });
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                const headerOffset = document.querySelector('nav').offsetHeight || 64;
+                const elementPosition = targetElement.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: "smooth"
+                });
+
+                if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                     menuButton.click(); // Menutup menu mobile jika terbuka
                 }
-            });
-        }
-
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const targetId = this.getAttribute('href');
-                const targetElement = document.querySelector(targetId);
-                if (targetElement) {
-                    // Calculate offset for fixed header
-                    const headerOffset = document.querySelector('nav').offsetHeight || 64; // 64px is h-16
-                    const elementPosition = targetElement.getBoundingClientRect().top;
-                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-                    window.scrollTo({
-                        top: offsetPosition,
-                        behavior: "smooth"
-                    });
-                    // Close mobile menu if open
-                    if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
-                         menuButton.click(); // Simulate click to close
-                    }
-                }
-            });
+            }
         });
     });
-    </script>
+
+    // Bagian 2: Logika untuk Galeri Gambar Interaktif
+
+    const imageContainer = document.getElementById('image-container');
+    const imageElement = document.getElementById('interactive-image');
+    
+    // Pastikan elemen ada sebelum melanjutkan
+    if (imageContainer && imageElement) {
+        const imagePaths = [
+            '<?php echo SITE_URL; ?>/assets/images/dashboard.png',
+            '<?php echo SITE_URL; ?>/assets/images/transactions.png',
+            '<?php echo SITE_URL; ?>/assets/images/reports.png'
+        ];
+        
+        let currentIndex = 0;
+        let intervalId = null;
+
+        function changeImage() {
+            imageElement.style.opacity = '0';
+            setTimeout(() => {
+                currentIndex = (currentIndex + 1) % imagePaths.length;
+                imageElement.src = imagePaths[currentIndex];
+                imageElement.style.opacity = '1';
+            }, 500);
+        }
+
+        imageContainer.addEventListener('mouseover', () => {
+            if (intervalId) clearInterval(intervalId);
+            intervalId = setInterval(changeImage, 2000);
+        });
+
+        imageContainer.addEventListener('mouseout', () => {
+            clearInterval(intervalId);
+            intervalId = null;
+            
+            imageElement.style.opacity = '0';
+            setTimeout(() => {
+                currentIndex = 0;
+                imageElement.src = imagePaths[0];
+                imageElement.style.opacity = '1';
+            }, 500);
+        });
+    }
+});
+</script>
 </body>
 </html>

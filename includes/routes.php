@@ -56,36 +56,44 @@ function redirect_to($routeName, $params = []) {
 }
 
 /**
- * Check if current page matches a route pattern
- * 
- * @param string $routeName The route constant name to check against
+ * Check if current page matches a route pattern (REVISED FUNCTION)
+ * * @param string $routeName The route constant name to check against
  * @return bool True if current page matches the route
  */
 function is_route_active($routeName) {
-    $route = constant($routeName);
-    $currentPath = $_SERVER['PHP_SELF'];
+    // Get the path part of the SITE_URL (e.g., /project-php)
+    $site_path = rtrim(parse_url(SITE_URL, PHP_URL_PATH), '/');
+
+    // Get the current script's path relative to the domain root (e.g., /project-php/dashboard.php)
+    $current_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+    // Get the path part of the route we are checking
+    $route_path = parse_url(constant($routeName), PHP_URL_PATH);
+
+    // Special case for Dashboard: active for both dashboard.php and index.php (when logged in)
+    if ($routeName === 'ROUTE_DASHBOARD') {
+        $dashboard_path = parse_url(ROUTE_DASHBOARD, PHP_URL_PATH);
+        $index_path = parse_url(ROUTE_INDEX, PHP_URL_PATH);
+        return in_array($current_path, [$dashboard_path, $index_path]);
+    }
+
+    // For other routes, check if the current path is within the route's "directory"
+    // e.g., current path '/project-php/transactions/create.php' should match route for '/project-php/transactions/index.php'
+    $route_dir = dirname($route_path);
     
-    // Handle special cases for index/dashboard
-    if ($routeName === 'ROUTE_DASHBOARD' && (basename($currentPath) === 'dashboard.php' || basename($currentPath) === 'index.php')) {
+    // Check if the current path starts with the route's directory path.
+    // The `+1` is to include the trailing slash for an exact directory match.
+    if (substr($current_path, 0, strlen($route_dir) + 1) === $route_dir . '/') {
         return true;
     }
-    
-    // Check if the route path matches the current path
-    if (strpos($currentPath, parse_url($route, PHP_URL_PATH)) !== false) {
-        return true;
-    }
-    
-    // Check for section matches (e.g., /transactions/, /reports/, etc.)
-    $routeSection = explode('/', parse_url($route, PHP_URL_PATH))[1] ?? '';
-    $currentSection = explode('/', $currentPath)[1] ?? '';
-    
-    return $routeSection && $routeSection === $currentSection;
+
+    return false;
 }
+
 
 /**
  * Get the active class if the current route matches
- * 
- * @param string $routeName The route constant name to check
+ * * @param string $routeName The route constant name to check
  * @param string $className The class to return if route is active
  * @return string The active class name or empty string
  */
