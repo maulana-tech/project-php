@@ -33,6 +33,9 @@ date_default_timezone_set('Asia/Jakarta'); // Adjust to your timezone
 $site_url = 'http://' . $_SERVER['HTTP_HOST'] . '/project-php';
 define('SITE_URL', $site_url);
 
+// Include routes
+require_once __DIR__ . '/routes.php';
+
 // Function to sanitize user inputs
 function sanitize_input($data) {
     global $conn;

@@ -2,7 +2,7 @@
 require_once 'includes/config.php';
 
 if (is_logged_in()) {
-    redirect(SITE_URL . '/dashboard.php');
+    redirect_to('ROUTE_DASHBOARD');
 } else {
-    redirect(SITE_URL . '/landing.php');
+    redirect_to('ROUTE_HOME');
 }
