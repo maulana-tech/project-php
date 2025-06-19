@@ -1,1 +1,23 @@
 database.sql
+
+# Composer dependencies
+/vendor/
+composer.lock
+
+# Configuration files
+/includes/config.php
+# Jika ada file config lain, tambahkan di sini, contoh:
+# /config/database.php
+
+# Log files
+*.log
+/logs/
+
+# Temporary files and editor specific files
+.env
+.DS_Store
+*.sublime-*
+*.bak
+*.swp
+Thumbs.db
+

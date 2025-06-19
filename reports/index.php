@@ -1,8 +1,13 @@
 <?php
-// Include configuration file
 require_once '../includes/config.php';
 
-// Check if user is logged in, if not redirect to login page
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Dompdf\Dompdf;
+use Dompdf\Options;
+
 if (!is_logged_in()) {
     redirect(SITE_URL . '/auth/login.php');
 }
@@ -14,8 +19,8 @@ $user_id = $_SESSION['user_id'];
 $page_title = 'Financial Reports';
 
 // Handle form submission for generating reports
-$start_date = isset($_GET['start_date']) ? $_GET['start_date'] : date('Y-m-01'); // First day of current month
-$end_date = isset($_GET['end_date']) ? $_GET['end_date'] : date('Y-m-t'); // Last day of current month
+$start_date = isset($_GET['start_date']) ? $_GET['start_date'] : date('Y-m-01');
+$end_date = isset($_GET['end_date']) ? $_GET['end_date'] : date('Y-m-t');
 $category_type = isset($_GET['category_type']) ? $_GET['category_type'] : 'all';
 $category_id = isset($_GET['category_id']) && is_numeric($_GET['category_id']) ? (int)$_GET['category_id'] : 0;
 $report_type = isset($_GET['report_type']) ? $_GET['report_type'] : 'summary';
@@ -84,24 +89,22 @@ $expense_by_category_query = "SELECT c.name, SUM(t.amount) as total
                             ORDER BY total DESC";
 $expense_by_category_result = $conn->query($expense_by_category_query);
 
-// Handle export functionality
+// --- Handle export functionality (Updated Section) ---
 $export_format = isset($_GET['export']) ? $_GET['export'] : '';
 
 if ($export_format) {
     $filename = 'financial_report_' . date('Y-m-d') . '.' . $export_format;
     
-    // Set headers based on export format
+    // Pastikan output tidak ada sebelum header dikirim
+    ob_clean(); 
+
     if ($export_format === 'csv') {
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
         
-        // Create CSV output
         $output = fopen('php://output', 'w');
         
-        // Add headers
         fputcsv($output, ['Date', 'Category', 'Type', 'Amount', 'Description']);
-        
-        // Add data
         foreach ($transactions as $transaction) {
             fputcsv($output, [
                 $transaction['transaction_date'],
@@ -112,7 +115,6 @@ if ($export_format) {
             ]);
         }
         
-        // Add summary
         fputcsv($output, []);
         fputcsv($output, ['Total Income', $total_income]);
         fputcsv($output, ['Total Expense', $total_expense]);
@@ -120,35 +122,177 @@ if ($export_format) {
         
         fclose($output);
         exit;
-    } elseif ($export_format === 'xls') {
-        header('Content-Type: application/vnd.ms-excel');
+    } elseif ($export_format === 'xlsx') { 
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
-        
-        echo '<table border="1">';
-        echo '<tr><th>Date</th><th>Category</th><th>Type</th><th>Amount</th><th>Description</th></tr>';
-        
+        header('Cache-Control: max-age=0');
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Set judul kolom
+        $sheet->setCellValue('A1', 'Date');
+        $sheet->setCellValue('B1', 'Category');
+        $sheet->setCellValue('C1', 'Type');
+        $sheet->setCellValue('D1', 'Amount');
+        $sheet->setCellValue('E1', 'Description');
+
+        // Isi data transaksi
+        $row_num = 2;
         foreach ($transactions as $transaction) {
-            echo '<tr>';
-            echo '<td>' . $transaction['transaction_date'] . '</td>';
-            echo '<td>' . $transaction['category_name'] . '</td>';
-            echo '<td>' . $transaction['category_type'] . '</td>';
-            echo '<td>' . $transaction['amount'] . '</td>';
-            echo '<td>' . $transaction['description'] . '</td>';
-            echo '</tr>';
+            $sheet->setCellValue('A' . $row_num, $transaction['transaction_date']);
+            $sheet->setCellValue('B' . $row_num, $transaction['category_name']);
+            $sheet->setCellValue('C' . $row_num, $transaction['category_type']);
+            $sheet->setCellValue('D' . $row_num, $transaction['amount']);
+            $sheet->setCellValue('E' . $row_num, $transaction['description']);
+            $row_num++;
         }
+        $row_num++;
+        // Tambah ringkasan
+        $sheet->setCellValue('C' . $row_num, 'Total Income');
+        $sheet->setCellValue('D' . $row_num, $total_income);
+        $row_num++;
+        $sheet->setCellValue('C' . $row_num, 'Total Expense');
+        $sheet->setCellValue('D' . $row_num, $total_expense);
+        $row_num++;
+        $sheet->setCellValue('C' . $row_num, 'Balance');
+        $sheet->setCellValue('D' . $row_num, $balance);
         
-        echo '<tr><td colspan="5"></td></tr>';
-        echo '<tr><td colspan="3">Total Income</td><td>' . $total_income . '</td><td></td></tr>';
-        echo '<tr><td colspan="3">Total Expense</td><td>' . $total_expense . '</td><td></td></tr>';
-        echo '<tr><td colspan="3">Balance</td><td>' . $balance . '</td><td></td></tr>';
-        echo '</table>';
+        foreach (range('A', 'E') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
         exit;
     } elseif ($export_format === 'pdf') {
-        // For PDF export, we would typically use a library like FPDF or TCPDF
-        // Since we don't have those libraries installed, we'll show a message
-        $_SESSION['message'] = 'PDF export requires additional libraries. Please install FPDF or TCPDF.';
-        $_SESSION['message_type'] = 'error';
-        redirect(SITE_URL . '/reports/index.php?' . http_build_query($_GET));
+        ob_start(); 
+        ?>
+        <style>
+            body { font-family: sans-serif; font-size: 10pt; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; }
+            .summary-box { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; display: inline-block; width: 30%; margin-right: 1%; }
+            .text-green-600 { color: #28a745; }
+            .text-red-600 { color: #dc3545; }
+            .text-blue-600 { color: #007bff; }
+            .text-right { text-align: right; }
+            .text-center { text-align: center; }
+        </style>
+        <h1>Financial Report</h1>
+        <p><strong>Period:</strong> <?php echo $start_date; ?> to <?php echo $end_date; ?></p>
+        <p><strong>Report Type:</strong> <?php echo ucfirst($report_type); ?></p>
+
+        <h2>Financial Summary</h2>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+            <div class="summary-box" style="background-color: #e6ffe6;">
+                <h3>Total Income</h3>
+                <p class="text-green-600" style="font-size: 1.5em; font-weight: bold;"><?php echo number_format($total_income, 2); ?></p>
+            </div>
+            <div class="summary-box" style="background-color: #ffe6e6;">
+                <h3>Total Expenses</h3>
+                <p class="text-red-600" style="font-size: 1.5em; font-weight: bold;"><?php echo number_format($total_expense, 2); ?></p>
+            </div>
+            <div class="summary-box" style="background-color: #e6f2ff;">
+                <h3>Balance</h3>
+                <p class="<?php echo $balance >= 0 ? 'text-green-600' : 'text-red-600'; ?>" style="font-size: 1.5em; font-weight: bold;">
+                    <?php echo number_format($balance, 2); ?>
+                </p>
+            </div>
+        </div>
+
+        <?php if ($total_income > 0 || $total_expense > 0): ?>
+        <h2>Category Breakdown</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th class="text-right">Income Amount</th>
+                    <th class="text-right">Income %</th>
+                    <th class="text-right">Expense Amount</th>
+                    <th class="text-right">Expense %</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                // Merge income and expense categories for display
+                $all_categories = [];
+                $income_by_category_result->data_seek(0);
+                while ($row = $income_by_category_result->fetch_assoc()) {
+                    $all_categories[$row['name']]['income_total'] = $row['total'];
+                }
+                $expense_by_category_result->data_seek(0);
+                while ($row = $expense_by_category_result->fetch_assoc()) {
+                    $all_categories[$row['name']]['expense_total'] = $row['total'];
+                }
+
+                ksort($all_categories);
+                
+                foreach ($all_categories as $category_name => $data):
+                    $income_amount = isset($data['income_total']) ? $data['income_total'] : 0;
+                    $expense_amount = isset($data['expense_total']) ? $data['expense_total'] : 0;
+                ?>
+                <tr>
+                    <td><?php echo $category_name; ?></td>
+                    <td class="text-right"><?php echo number_format($income_amount, 2); ?></td>
+                    <td class="text-right">
+                        <?php echo $total_income > 0 ? number_format(($income_amount / $total_income) * 100, 1) : 0; ?>%
+                    </td>
+                    <td class="text-right"><?php echo number_format($expense_amount, 2); ?></td>
+                    <td class="text-right">
+                        <?php echo $total_expense > 0 ? number_format(($expense_amount / $total_expense) * 100, 1) : 0; ?>%
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+        <?php endif; ?>
+
+        <?php if ($report_type === 'detailed' && !empty($transactions)): ?>
+        <h2>Transaction Details</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th class="text-right">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($transactions as $transaction): ?>
+                <tr>
+                    <td><?php echo $transaction['transaction_date']; ?></td>
+                    <td><?php echo $transaction['category_name']; ?></td>
+                    <td><?php echo $transaction['description']; ?></td>
+                    <td class="text-right" style="color: <?php echo $transaction['category_type'] === 'income' ? '#28a745' : '#dc3545'; ?>;">
+                        <?php echo number_format($transaction['amount'], 2); ?>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+        <?php endif; ?>
+
+        <?php 
+        $html = ob_get_clean(); // Ambil output HTML dan bersihkan buffer
+
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isRemoteEnabled', true); 
+
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($html);
+
+        $dompdf->setPaper('A4', 'portrait');
+
+        // Render HTML to PDF
+        $dompdf->render();
+
+        // Output PDF ke browser
+        $dompdf->stream($filename, ['Attachment' => true]);
+        exit;
     }
 }
 
@@ -160,7 +304,6 @@ include_once '../includes/header.php';
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-bold text-gray-800">Financial Reports</h1>
         
-        <!-- Save Report Button -->
         <?php if (!empty($transactions)): ?>
         <button id="saveReportBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
             <i class="fas fa-save mr-2"></i> Save Report
@@ -168,7 +311,6 @@ include_once '../includes/header.php';
         <?php endif; ?>
     </div>
     
-    <!-- Report Filters -->
     <div class="bg-white shadow-md rounded-lg p-6 mb-6">
         <h2 class="text-lg font-semibold mb-4">Generate Report</h2>
         
@@ -249,8 +391,8 @@ include_once '../includes/header.php';
                     <a href="<?php echo SITE_URL; ?>/reports/index.php?<?php echo http_build_query(array_merge($_GET, ['export' => 'csv'])); ?>" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
                         <i class="fas fa-file-csv mr-2"></i> CSV
                     </a>
-                    <a href="<?php echo SITE_URL; ?>/reports/index.php?<?php echo http_build_query(array_merge($_GET, ['export' => 'xls'])); ?>" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                        <i class="fas fa-file-excel mr-2"></i> XLS
+                    <a href="<?php echo SITE_URL; ?>/reports/index.php?<?php echo http_build_query(array_merge($_GET, ['export' => 'xlsx'])); ?>" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        <i class="fas fa-file-excel mr-2"></i> XLSX
                     </a>
                     <a href="<?php echo SITE_URL; ?>/reports/index.php?<?php echo http_build_query(array_merge($_GET, ['export' => 'pdf'])); ?>" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                         <i class="fas fa-file-pdf mr-2"></i> PDF
@@ -262,7 +404,6 @@ include_once '../includes/header.php';
     </div>
     
     <?php if (!empty($transactions)): ?>
-    <!-- Financial Summary -->
     <div class="bg-white shadow-md rounded-lg p-6 mb-6">
         <h2 class="text-lg font-semibold mb-4">Financial Summary</h2>
         
@@ -285,9 +426,7 @@ include_once '../includes/header.php';
             </div>
         </div>
         
-        <!-- Category Breakdown -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Income by Category -->
             <div>
                 <h3 class="text-md font-medium text-gray-700 mb-2">Income by Category</h3>
                 <div class="overflow-hidden bg-white rounded-lg border">
@@ -320,7 +459,6 @@ include_once '../includes/header.php';
                 </div>
             </div>
             
-            <!-- Expense by Category -->
             <div>
                 <h3 class="text-md font-medium text-gray-700 mb-2">Expense by Category</h3>
                 <div class="overflow-hidden bg-white rounded-lg border">
@@ -355,7 +493,6 @@ include_once '../includes/header.php';
         </div>
     </div>
     
-    <!-- Transaction Details -->
     <?php if ($report_type === 'detailed'): ?>
     <div class="bg-white shadow-md rounded-lg p-6 mb-6">
         <h2 class="text-lg font-semibold mb-4">Transaction Details</h2>
@@ -398,7 +535,6 @@ include_once '../includes/header.php';
     <?php endif; ?>
 </div>
 
-<!-- Save Report Modal -->
 <div id="saveReportModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center">
     <div class="bg-white rounded-lg p-6 w-full max-w-md">
         <h2 class="text-xl font-semibold mb-4">Save Report</h2>
