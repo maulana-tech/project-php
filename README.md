@@ -22,8 +22,11 @@ Aplikasi manajemen keuangan berbasis web yang dibuat dengan PHP, dirancang untuk
 
 ## Screenshot
 
-![Tampilan Dashboard](#)
-![Tampilan Laporan](#)
+![Tampilan Dashboard](/assets/images/dashboard.png)
+
+![Tampilan Laporan](/assets/images/reports.png)
+
+![Tampilan Transaksi](/assets/images/transactions.png)
 
 ## Teknologi yang Digunakan
 
