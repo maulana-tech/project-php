@@ -1,8 +1,6 @@
 <?php
-// Include configuration file
 require_once '../includes/config.php';
 
-// Check if user is logged in, if not redirect to login page
 if (!is_logged_in()) {
     redirect(SITE_URL . '/auth/login.php');
 }
@@ -96,7 +94,6 @@ $transactions_result = $conn->query($transactions_query);
 $categories_query = "SELECT * FROM categories ORDER BY type, name";
 $categories_result = $conn->query($categories_query);
 
-// Include header
 include_once '../includes/header.php';
 ?>
 

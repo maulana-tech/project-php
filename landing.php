@@ -5,7 +5,6 @@ if (is_logged_in()) {
     redirect(SITE_URL . '/dashboard.php');
 }
 
-// Set page title
 $page_title = 'Selamat Datang di Analisis Keuangan Pribadi Anda';
 ?>
 <!DOCTYPE html>
@@ -28,7 +27,6 @@ $page_title = 'Selamat Datang di Analisis Keuangan Pribadi Anda';
 </head>
 <body>
     <?php
-    // Include landing page specific navigation
     include_once 'includes/landing_navigation.php';
     ?>
 
@@ -282,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const imageContainer = document.getElementById('image-container');
     const imageElement = document.getElementById('interactive-image');
     
-    // Pastikan elemen ada sebelum melanjutkan
+    // memastikan bahwa elemen ada sebelum melanjutkan
     if (imageContainer && imageElement) {
         const imagePaths = [
             '<?php echo SITE_URL; ?>/assets/images/dashboard.png',

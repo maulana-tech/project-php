@@ -1,8 +1,6 @@
 <?php
-// Include configuration file
 require_once 'includes/config.php';
 
-// Check if user is logged in, if not redirect to login page
 if (!is_logged_in()) {
     redirect(SITE_URL . '/auth/login.php');
 }
@@ -11,10 +9,8 @@ if (!is_logged_in()) {
 $user_id = $_SESSION['user_id'];
 $username = $_SESSION['username'];
 
-// Page title
 $page_title = 'Dashboard';
 
-// Include header
 include_once 'includes/header.php';
 
 // Get financial summary data

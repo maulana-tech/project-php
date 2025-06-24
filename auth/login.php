@@ -42,7 +42,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Include header
 include_once '../includes/header.php';
 ?>
 
@@ -51,7 +50,7 @@ include_once '../includes/header.php';
         <div class="bg-white shadow-md rounded-lg px-8 py-6">
             <div class="text-center mb-6">
                 <h1 class="text-2xl font-bold text-gray-800">Login to Your Account</h1>
-                <p class="text-gray-600 mt-2">Enter your credentials to access your dashboard</p>
+                <p class="text-gray-600 mt-2">Masukkan kredensial Anda untuk mengakses dasbor Anda</p>
             </div>
             
             <?php if (!empty($error)): ?>
